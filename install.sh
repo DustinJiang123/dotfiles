@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
 # Dotfiles installer — interactive, safe, i18n-ready
+#
+# Requires bash 4+ (for associative arrays). macOS ships bash 3.2 by default,
+# so we re-exec under a newer bash if available.
+if [ -z "${BASH_VERSION:-}" ] || [ "${BASH_VERSINFO[0]:-0}" -lt 4 ]; then
+  for newer_bash in /opt/homebrew/bin/bash /usr/local/bin/bash; do
+    if [ -x "$newer_bash" ]; then
+      exec "$newer_bash" "$0" "$@"
+    fi
+  done
+  echo "ERROR: This installer requires bash 4 or newer." >&2
+  echo "  Current bash: ${BASH_VERSION:-not bash}" >&2
+  echo "" >&2
+  echo "On macOS, install a newer bash with:" >&2
+  echo "  brew install bash" >&2
+  echo "" >&2
+  echo "Then re-run: ./install.sh" >&2
+  exit 1
+fi
+
 set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "$0")" && pwd)"
@@ -8,6 +27,7 @@ BACKUP_DIR="$HOME/.dotfiles-backups/$(date +%Y%m%d-%H%M%S)"
 # ---- i18n ----------------------------------------------------------------
 
 declare -A T
+declare -A SELECTED
 
 set_lang() {
   case "${1:-}" in
@@ -305,12 +325,25 @@ step_packages() {
     sudo apt update -qq || true
 
     info "${T[apt_installing]}"
-    if sudo apt install -y $(grep -v '^#' "$DOTFILES/packages.txt" | tr '\n' ' '); then
+    local failed_pkgs=()
+    local pkg
+    while IFS= read -r pkg; do
+      [ -z "$pkg" ] && continue
+      [[ "$pkg" =~ ^[[:space:]]*# ]] && continue
+      if sudo apt install -y "$pkg" >/dev/null 2>&1; then
+        ok "$pkg"
+      else
+        warn "$pkg — not available, skipping"
+        failed_pkgs+=("$pkg")
+      fi
+    done < <(grep -v '^#' "$DOTFILES/packages.txt")
+
+    if [ ${#failed_pkgs[@]} -eq 0 ]; then
       ok "${T[apt_ok]}"
       return 0
     else
-      fail "${T[apt_fail]}"
-      return 1
+      warn "${T[apt_ok]} (skipped: ${failed_pkgs[*]})"
+      return 0
     fi
 
   elif command -v brew &>/dev/null; then
@@ -638,7 +671,6 @@ main() {
 
   # Menu
   T[risk_label]=$( [[ "$lang_choice" = "1" ]] && echo "风险" || echo "Risk" )
-  declare -A SELECTED
   run_menu
 
   # Summary of what will be done
@@ -647,7 +679,7 @@ main() {
   for i in $(seq 1 6); do
     if [ "${SELECTED[$i]}" = "✓" ]; then
       local item="menu_item_$i"
-      echo "  $(t "$C_GREEN" "C_GREEN")▶${C_RESET} ${T[$item]}"
+      echo -e "  ${C_GREEN}▶${C_RESET} ${T[$item]}"
     fi
   done
   echo ""
@@ -684,9 +716,9 @@ main() {
   for i in $(seq 0 5); do
     local name="${step_names[$i]}"
     case "${results[$i]}" in
-      ok)     echo -e "  $(t "$C_GREEN" "C_GREEN")✓${C_RESET} ${T[$name]}" ;;
-      skip)   echo -e "  $(t "$C_YELLOW" "C_YELLOW")⏭${C_RESET} ${T[$name]} — ${T[skip]}" ;;
-      failed) echo -e "  $(t "$C_RED" "C_RED")✗${C_RESET} ${T[$name]} — ${T[failed]}" ;;
+      ok)     echo -e "  ${C_GREEN}✓${C_RESET} ${T[$name]}" ;;
+      skip)   echo -e "  ${C_YELLOW}⏭${C_RESET} ${T[$name]} — ${T[skip]}" ;;
+      failed) echo -e "  ${C_RED}✗${C_RESET} ${T[$name]} — ${T[failed]}" ;;
     esac
   done
 
