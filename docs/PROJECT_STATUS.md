@@ -6,7 +6,7 @@ v1.0 — 核心功能完整，已可在新机器上通过 `./install.sh` 一键�
 
 ## 仓库
 
-https://github.com/DustinJiang123/dotfiles
+https://github.com/jcdustin/dotfiles
 
 ## 做了什么
 
