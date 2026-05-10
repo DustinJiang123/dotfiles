@@ -24,10 +24,10 @@
 | 分类 | 内容 |
 |------|------|
 | Shell | Oh My Zsh + agnoster 主题 + 语法高亮 + 自动补全建议 |
-| 导航 | zoxide（智能跳转）+ fzf（模糊搜索） |
-| 效率工具 | `bat`（语法高亮 cat）、`eza`（现代 ls）、`fd`（现代 find） |
+| 导航 | zoxide（智能跳转）+ fzf + `..` `...` `....` 快捷返回 |
+| 效率工具 | `mkd`（创建并进入）、`tre`（树状查看）、`server`（HTTP 服务）、`fs`（大小统计）、`bat`、`eza`、`fd` |
 | 编辑器 | Vim + 10 个插件（NERDTree、fugitive、fzf.vim 等） |
-| 其他 | jq、glow、gh、tldr、btop、dust、tmux |
+| 其他 | jq、glow、gh、tldr、btop、dust、tmux、`dataurl`、`myip`、`cleanup` |
 
 ## 🚀 快速开始
 
@@ -124,9 +124,9 @@ alias work="cd ~/projects/secret-project"
 
 | 平台 | 状态 |
 |------|------|
-| Ubuntu / Debian | 完整支持 |
-| macOS | Brewfile（待完善） |
-| WSL2 | 完整支持；字体需在 Windows 端安装 |
+| Ubuntu / Debian | 完整支持（`apt`） |
+| macOS | 完整支持（`brew`） |
+| WSL2 | 完整支持（`apt`）；字体需在 Windows 端安装 |
 | 其他 Linux | 需手动安装软件包 |
 
 ## 🔠 字体

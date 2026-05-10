@@ -24,10 +24,10 @@
 | Category | What you get |
 |----------|-------------|
 | Shell | Oh My Zsh + agnoster theme + syntax highlighting + autosuggestions |
-| Navigation | zoxide (smart `cd`) + fzf (fuzzy finder) |
-| Productivity | `bat` (syntax-highlighted cat), `eza` (modern ls), `fd` (modern find) |
+| Navigation | zoxide (smart `cd`) + fzf + `..` `...` `....` shortcuts |
+| Productivity | `mkd` (mkdir+cd), `tre` (tree), `server` (HTTP), `fs` (size), `bat`, `eza`, `fd` |
 | Editor | Vim + 10 plugins (NERDTree, fugitive, fzf.vim, etc.) |
-| Tools | jq, glow, gh, tldr, btop, dust, tmux |
+| Tools | jq, glow, gh, tldr, btop, dust, tmux, `dataurl`, `myip`, `cleanup` |
 
 ## 🚀 Quick Start
 
@@ -124,9 +124,9 @@ alias work="cd ~/projects/secret-project"
 
 | Platform | Status |
 |----------|--------|
-| Ubuntu / Debian | Full support |
-| macOS | Brewfile (WIP) |
-| WSL2 | Full support; font installed on Windows side |
+| Ubuntu / Debian | Full support (`apt`) |
+| macOS | Full support (`brew`) |
+| WSL2 | Full support (`apt`); font on Windows side |
 | Other Linux | Manual package install |
 
 ## 🔠 Font

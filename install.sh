@@ -276,39 +276,75 @@ is_wsl() {
   grep -qi microsoft /proc/version 2>/dev/null
 }
 
+is_macos() {
+  [ "$(uname -s)" = "Darwin" ]
+}
+
 # ---- step functions ------------------------------------------------------
 
-step_apt() {
+step_packages() {
   step_header "1" "apt_title"
 
-  if ! command -v apt &>/dev/null; then
-    fail "${T[apt_not_found]}"
-    return 1
-  fi
+  if command -v apt &>/dev/null; then
+    # ── Linux / apt ────────────────────────────────────
+    echo ""
+    echo "${T[apt_will_install]}"
+    echo ""
+    grep -v '^#' "$DOTFILES/packages.txt" | sed 's/^/  - /'
+    echo ""
+    echo "  sudo apt update && sudo apt install [packages]"
+    echo ""
 
-  echo ""
-  echo "${T[apt_will_install]}"
-  echo ""
-  grep -v '^#' "$DOTFILES/packages.txt" | sed 's/^/  - /'
-  echo ""
-  echo "${T[apt_cmd]}: sudo apt update && sudo apt install $(grep -v '^#' "$DOTFILES/packages.txt" | tr '\n' ' ')"
-  echo ""
+    read -r -p "${T[apt_confirm]} " yn
+    if [[ ! "$yn" =~ ^[Yy] ]]; then
+      warn "${T[skip]}"
+      return 2
+    fi
 
-  read -r -p "${T[apt_confirm]} " yn
-  if [[ ! "$yn" =~ ^[Yy] ]]; then
-    warn "${T[skip]}"
-    return 2
-  fi
+    info "${T[apt_updating]}"
+    sudo apt update -qq || true
 
-  info "${T[apt_updating]}"
-  sudo apt update -qq || true
+    info "${T[apt_installing]}"
+    if sudo apt install -y $(grep -v '^#' "$DOTFILES/packages.txt" | tr '\n' ' '); then
+      ok "${T[apt_ok]}"
+      return 0
+    else
+      fail "${T[apt_fail]}"
+      return 1
+    fi
 
-  info "${T[apt_installing]}"
-  if sudo apt install -y $(grep -v '^#' "$DOTFILES/packages.txt" | tr '\n' ' '); then
-    ok "${T[apt_ok]}"
-    return 0
+  elif command -v brew &>/dev/null; then
+    # ── macOS / Homebrew ───────────────────────────────
+    echo ""
+    echo "Will install the following via Homebrew:"
+    echo ""
+    if [ -f "$DOTFILES/Brewfile" ] && grep -qv '^#' "$DOTFILES/Brewfile"; then
+      grep -v '^#' "$DOTFILES/Brewfile" | grep -v '^[[:space:]]*$' | sed 's/^/  /'
+    fi
+    echo ""
+    echo "  brew bundle --file=$DOTFILES/Brewfile"
+    echo ""
+
+    read -r -p "${T[apt_confirm]} " yn
+    if [[ ! "$yn" =~ ^[Yy] ]]; then
+      warn "${T[skip]}"
+      return 2
+    fi
+
+    info "Updating Homebrew..."
+    brew update
+
+    info "Installing packages..."
+    if brew bundle --file="$DOTFILES/Brewfile"; then
+      ok "${T[apt_ok]}"
+      return 0
+    else
+      fail "${T[apt_fail]}"
+      return 1
+    fi
+
   else
-    fail "${T[apt_fail]}"
+    fail "No supported package manager found (apt or brew)."
     return 1
   fi
 }
@@ -623,7 +659,7 @@ main() {
 
   # Execute steps
   local results=()
-  local steps=(step_apt step_shell step_omz step_plugins step_extra step_font)
+  local steps=(step_packages step_shell step_omz step_plugins step_extra step_font)
 
   for i in $(seq 0 5); do
     if [ "${SELECTED[$((i+1))]}" = "✓" ]; then

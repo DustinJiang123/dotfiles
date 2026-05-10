@@ -30,9 +30,19 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
 
+# ---- navigation shortcuts -------------------------------------------------
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias ~='cd ~'
+alias -- -='cd -'
+
 # ---- aliases -------------------------------------------------------------
 
-# bat (Ubuntu binary is batcat)
+# sudo with alias expansion (trailing space allows next-word alias expansion)
+alias sudo='sudo '
+
+# bat: modern cat (Ubuntu → batcat, macOS/brew → bat)
 if command -v batcat &>/dev/null; then
   alias cat='batcat --paging=never'
 elif command -v bat &>/dev/null; then
@@ -46,15 +56,93 @@ if command -v eza &>/dev/null; then
   alias tree='eza --tree --icons'
 fi
 
-# fd: modern find (Ubuntu binary is fdfind)
+# fd: modern find (Ubuntu → fdfind, macOS → fd)
 if command -v fdfind &>/dev/null; then
   alias fd='fdfind'
 elif command -v fd &>/dev/null; then
-  : # already fd
+  : # usable as-is
 fi
+
+# PATH debugging
+alias path='echo -e ${PATH//:/\\n}'
 
 # Claude Code shortcut
 command -v claude &>/dev/null && alias c='claude'
+
+# shell reload
+alias reload='exec ${SHELL} -l'
+
+# ---- functions ------------------------------------------------------------
+
+# Create directory and enter it
+mkd() {
+  mkdir -p "$@" && cd "${@:$#}" || return 1
+}
+
+# File/directory size
+fs() {
+  if du -b /dev/null &>/dev/null 2>&1; then
+    local arg=-sbh
+  else
+    local arg=-sh
+  fi
+  if [ -z "$*" ]; then
+    du $arg ./*
+  else
+    du $arg "$@"
+  fi
+}
+
+# Start HTTP server in current directory (port 8000 or custom)
+server() {
+  local port="${1:-8000}"
+  if command -v python3 &>/dev/null; then
+    python3 -m http.server "$port"
+  elif command -v python &>/dev/null; then
+    python -m SimpleHTTPServer "$port"
+  else
+    echo "No Python found" >&2
+    return 1
+  fi
+}
+
+# Enhanced tree (ignores .git, node_modules; respects .gitignore if ripgrep available)
+tre() {
+  if command -v eza &>/dev/null; then
+    eza --tree --icons -a -I '.git|node_modules|.cache' --git-ignore "$@" | less -R
+  elif command -v tree &>/dev/null; then
+    tree -aC -I '.git|node_modules|.cache' "$@" | less -R
+  else
+    echo "Install eza or tree first" >&2
+    return 1
+  fi
+}
+
+# Recursively delete .DS_Store files
+cleanup() {
+  find "${1:-.}" -type f -name '*.DS_Store' -ls -delete
+}
+
+# Convert file to base64 data URL
+dataurl() {
+  if [ -z "$1" ]; then
+    echo "Usage: dataurl <file>" >&2
+    return 1
+  fi
+  local mime
+  mime=$(file -b --mime-type "$1")
+  echo "data:${mime};base64,$(base64 -i "$1")"
+}
+
+# Get public IP
+myip() {
+  curl -s https://ipinfo.io/ip && echo
+}
+
+# ISO week number
+week() {
+  date +%V
+}
 
 # ---- tools ---------------------------------------------------------------
 
