@@ -100,6 +100,22 @@ cfg() {
     diff)
       git -C ~/dotfiles diff
       ;;
+    log)
+      git -C ~/dotfiles log --oneline -10
+      ;;
+    help|--help|-h)
+      echo "cfg — dotfiles 管理快捷命令"
+      echo ""
+      echo "  cfg          进入 ~/dotfiles 目录"
+      echo "  cfg edit     编辑 ~/dotfiles/home/.zshrc"
+      echo "  cfg reload   重新加载配置（立即生效）"
+      echo "  cfg status   查看文件变更状态"
+      echo "  cfg diff     查看具体改动内容"
+      echo "  cfg log      查看提交历史"
+      echo "  cfg backup   备份当前 ~/.zshrc"
+      echo "  cfg commit   git commit（不自动 push）"
+      echo "  cfg push     推送到 GitHub（会确认）"
+      ;;
     *)
       cd ~/dotfiles || return 1
       ;;
