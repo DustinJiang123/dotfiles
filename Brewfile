@@ -12,7 +12,9 @@ brew "fd"
 brew "fzf"
 
 # Tools
+brew "bash"           # macOS ships bash 3.2; install.sh requires bash 4+
 brew "btop"
+brew "dust"           # disk usage analyzer (Linux side downloads from GitHub releases)
 brew "gh"
 brew "glow"
 brew "jq"

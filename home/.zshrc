@@ -2,26 +2,76 @@
 # This file is meant to be sourced from ~/.zshrc, NOT symlinked.
 # Your ~/.zshrc should contain this line at the end:
 #   [ -f ~/dotfiles/home/.zshrc ] && source ~/dotfiles/home/.zshrc
+#
+# Layered, opt-out design — set any of these BEFORE the source line in
+# your ~/.zshrc to skip a specific layer:
+#
+#   DOTFILES_SKIP_THEME=1     skip OMZ theme/plugin loading entirely
+#                             (e.g. when you load p10k yourself or use a
+#                              completely different prompt framework)
+#   DOTFILES_SKIP_HISTORY=1   skip the history defaults
+#   DOTFILES_SKIP_COLORS=1    skip EZA_COLORS / BAT_THEME defaults
+#
+# To add EXTRA Oh My Zsh plugins on top of the dotfiles defaults, set:
+#   DOTFILES_EXTRA_PLUGINS=(z docker zsh-completions zsh-history-substring-search)
 # ──────────────────────────────────────────────────────────────────────────
 
 # ---- PATH ----------------------------------------------------------------
 export PATH="$HOME/.local/bin:$PATH"
 
-# ---- Oh My Zsh -----------------------------------------------------------
+# ---- Oh My Zsh + theme + plugins (opt-out via DOTFILES_SKIP_THEME) -------
 export ZSH="$HOME/.oh-my-zsh"
 
-if [ -f "$ZSH/oh-my-zsh.sh" ]; then
-  ZSH_THEME="agnoster"
+if [ -z "${DOTFILES_SKIP_THEME:-}" ] && [ -f "$ZSH/oh-my-zsh.sh" ]; then
+  # Theme: prefer powerlevel10k if installed, fall back to agnoster.
+  # Users can override by setting ZSH_THEME before sourcing this file.
+  if [ -z "${ZSH_THEME:-}" ]; then
+    if [ -d "$ZSH/custom/themes/powerlevel10k" ]; then
+      ZSH_THEME="powerlevel10k/powerlevel10k"
+    else
+      ZSH_THEME="agnoster"
+    fi
+  fi
 
-  # Only load plugins that actually exist
+  # Powerlevel10k instant prompt (must come before sourcing oh-my-zsh).
+  if [[ "$ZSH_THEME" == powerlevel10k/* ]]; then
+    if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+      source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+    fi
+  fi
+
+  # Plugins — start with curated defaults, then add anything the user
+  # asked for via DOTFILES_EXTRA_PLUGINS, and only enable plugins whose
+  # files actually exist on disk so a missing one doesn't break the shell.
+  local _custom_plugins="$ZSH/custom/plugins"
   plugins=(git)
+  [ -d "$_custom_plugins/zsh-autosuggestions" ] && plugins+=(zsh-autosuggestions)
+  [ -d "$_custom_plugins/zsh-syntax-highlighting" ] && plugins+=(zsh-syntax-highlighting)
 
-  local custom_plugins="$ZSH/custom/plugins"
-  [ -d "$custom_plugins/zsh-autosuggestions" ] && plugins+=(zsh-autosuggestions)
-  [ -d "$custom_plugins/zsh-syntax-highlighting" ] && plugins+=(zsh-syntax-highlighting)
+  if [ -n "${DOTFILES_EXTRA_PLUGINS:-}" ]; then
+    local _p
+    for _p in "${DOTFILES_EXTRA_PLUGINS[@]}"; do
+      if [ -d "$_custom_plugins/$_p" ] || [ -d "$ZSH/plugins/$_p" ]; then
+        plugins+=("$_p")
+      fi
+    done
+  fi
+
+  # Recommended for zsh-autosuggestions
+  export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
   source "$ZSH/oh-my-zsh.sh"
-else
+
+  # p10k user config (loaded after OMZ so theme is active)
+  if [[ "$ZSH_THEME" == powerlevel10k/* ]]; then
+    # Prefer the user's own ~/.p10k.zsh, fall back to the dotfiles copy.
+    if [ -f "$HOME/.p10k.zsh" ]; then
+      source "$HOME/.p10k.zsh"
+    elif [ -f "$HOME/dotfiles/home/.p10k.zsh" ]; then
+      source "$HOME/dotfiles/home/.p10k.zsh"
+    fi
+  fi
+elif [ -z "${DOTFILES_SKIP_THEME:-}" ]; then
   echo "ℹ Oh My Zsh not found at $ZSH — run install.sh to set it up" >&2
 fi
 
@@ -29,6 +79,14 @@ fi
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+
+# ---- history (opt-out via DOTFILES_SKIP_HISTORY) -------------------------
+if [ -z "${DOTFILES_SKIP_HISTORY:-}" ]; then
+  export HISTSIZE=100000
+  export SAVEHIST=100000
+  setopt INC_APPEND_HISTORY   # append history immediately
+  setopt SHARE_HISTORY        # share history across sessions
+fi
 
 # ---- navigation shortcuts -------------------------------------------------
 alias ..='cd ..'
@@ -49,18 +107,17 @@ elif command -v bat &>/dev/null; then
   alias cat='bat --paging=never'
 fi
 
-# eza: modern ls
+# eza: modern ls (with git status when available)
 if command -v eza &>/dev/null; then
-  alias ls='eza --icons --group-directories-first'
-  alias la='eza -la --icons --group-directories-first'
-  alias tree='eza --tree --icons'
+  alias ls='eza --icons --git --group-directories-first'
+  alias ll='eza -l --icons --git --group-directories-first --time-style=long-iso'
+  alias la='eza -la --icons --git --group-directories-first'
+  alias tree='eza --tree --icons --level=2'
 fi
 
 # fd: modern find (Ubuntu → fdfind, macOS → fd)
 if command -v fdfind &>/dev/null; then
   alias fd='fdfind'
-elif command -v fd &>/dev/null; then
-  : # usable as-is
 fi
 
 # PATH debugging
@@ -71,6 +128,33 @@ command -v claude &>/dev/null && alias c='claude'
 
 # shell reload
 alias reload='exec ${SHELL} -l'
+
+# ---- colors (opt-out via DOTFILES_SKIP_COLORS) ---------------------------
+if [ -z "${DOTFILES_SKIP_COLORS:-}" ]; then
+  # Universal Dracula-ish color scheme for eza
+  export EZA_COLORS="\
+uu=36:\
+uR=31:\
+un=35:\
+gu=37:\
+da=2;34:\
+ur=34:\
+uw=95:\
+ux=36:\
+ue=36:\
+gr=34:\
+gw=35:\
+gx=36:\
+tr=34:\
+tw=35:\
+tx=36:\
+xx=95:"
+
+  # bat theme — only set if bat is present and user hasn't overridden
+  if [ -z "${BAT_THEME:-}" ] && (command -v bat &>/dev/null || command -v batcat &>/dev/null); then
+    export BAT_THEME="TwoDark"
+  fi
+fi
 
 # ---- functions ------------------------------------------------------------
 
@@ -106,7 +190,7 @@ server() {
   fi
 }
 
-# Enhanced tree (ignores .git, node_modules; respects .gitignore if ripgrep available)
+# Enhanced tree (ignores .git, node_modules; respects .gitignore if available)
 tre() {
   if command -v eza &>/dev/null; then
     eza --tree --icons -a -I '.git|node_modules|.cache' --git-ignore "$@" | less -R
@@ -177,10 +261,10 @@ cfg() {
       echo "Committed. To push, run: git -C ~/dotfiles push"
       ;;
     push)
-      git -C ~/dotfiles push --dry-run && \
-        read -r "?Push to origin? [y/N] " yn && \
-        [[ "$yn" =~ ^[Yy] ]] && \
-        git -C ~/dotfiles push
+      git -C ~/dotfiles push --dry-run || return 1
+      local yn
+      read -r "yn?Push to origin? [y/N] "
+      [[ "$yn" =~ ^[Yy] ]] && git -C ~/dotfiles push
       ;;
     status)
       git -C ~/dotfiles status
@@ -211,6 +295,6 @@ cfg() {
 }
 
 # ---- private extras (not tracked by git) ---------------------------------
-# Put machine-specific or secret configs here.
-# This file is NOT tracked by the dotfiles repo.
+# Put machine-specific PATH, secrets, work-only aliases, etc. here.
+# This file is NOT tracked by the dotfiles repo. See .extra.example.
 [ -f ~/.extra ] && source ~/.extra

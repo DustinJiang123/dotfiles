@@ -1,0 +1,44 @@
+# ~/.extra — machine-specific configuration (NOT tracked by git)
+#
+# Copy this file to ~/.extra and edit:
+#   cp ~/dotfiles/home/.extra.example ~/.extra
+#
+# Anything here is sourced last, so it can override any default.
+# Good candidates:
+#   - PATH additions for tools installed outside the standard paths
+#   - work-only aliases that should not be public
+#   - API tokens / secrets (consider a secret manager instead)
+#   - per-machine theme/plugin tweaks via DOTFILES_* environment vars
+# ──────────────────────────────────────────────────────────────────────────
+
+# ---- Layer toggles (must be set BEFORE sourcing dotfiles, so put these
+#      ABOVE the source line in your ~/.zshrc, not in ~/.extra) -----------
+# export DOTFILES_SKIP_THEME=1
+# export DOTFILES_SKIP_HISTORY=1
+# export DOTFILES_SKIP_COLORS=1
+# export DOTFILES_EXTRA_PLUGINS=(z docker zsh-completions zsh-history-substring-search)
+
+# ---- Machine-specific PATH additions -------------------------------------
+# Examples (uncomment and adapt):
+# export PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin:$PATH"
+# export PATH="$HOME/.opencode/bin:$PATH"
+# export PATH="$HOME/Library/Python/3.9/bin:$PATH"
+# export PATH="$HOME/go/bin:$PATH"
+
+# ---- Tool-specific environment variables ---------------------------------
+# Node legacy OpenSSL (needed for some older webpack stacks)
+# export NODE_OPTIONS=--openssl-legacy-provider
+
+# Ollama tuning
+# export OLLAMA_KEEP_ALIVE="2m"
+# export OLLAMA_MAX_LOADED_MODELS=1
+# export OLLAMA_NUM_PARALLEL=1
+# export OLLAMA_FLASH_ATTENTION=1
+
+# ---- Work-only aliases ---------------------------------------------------
+# alias work='cd ~/projects/internal-thing'
+# alias deploy-staging='./scripts/deploy.sh staging'
+
+# ---- Secrets (prefer a secret manager — these are illustrative only) -----
+# export GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxx"
+# export OPENAI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxx"
