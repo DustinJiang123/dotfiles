@@ -108,6 +108,18 @@ cfg commit "msg" # Commit (no auto-push)
 cfg push         # Push to GitHub (with confirmation)
 ```
 
+### Private configs
+
+Create `~/.extra` for anything you don't want in a public repo:
+
+```bash
+# ~/.extra — sourced by dotfiles, never committed
+export GITHUB_TOKEN="ghp_xxx"
+alias work="cd ~/projects/secret-project"
+```
+
+
+
 ## 🖥️ Platform Support
 
 | Platform | Status |

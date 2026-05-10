@@ -108,6 +108,18 @@ cfg commit "消息" # 提交到 git（不自动 push）
 cfg push         # 推送到 GitHub（会先确认）
 ```
 
+### 私人配置
+
+创建 `~/.extra` 存放不想公开的内容：
+
+```bash
+# ~/.extra — dotfiles 会自动加载，不会被 git 追踪
+export GITHUB_TOKEN="ghp_xxx"
+alias work="cd ~/projects/secret-project"
+```
+
+
+
 ## 🖥️ 平台支持
 
 | 平台 | 状态 |

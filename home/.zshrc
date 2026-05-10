@@ -121,3 +121,8 @@ cfg() {
       ;;
   esac
 }
+
+# ---- private extras (not tracked by git) ---------------------------------
+# Put machine-specific or secret configs here.
+# This file is NOT tracked by the dotfiles repo.
+[ -f ~/.extra ] && source ~/.extra
