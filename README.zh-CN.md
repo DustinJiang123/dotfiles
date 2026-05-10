@@ -31,9 +31,57 @@
 | 历史 | 10 万条历史，追加即时写入，多会话共享 |
 | 分层 | 主题/历史/配色/插件每层都可独立关闭 |
 
-## 🚀 快速开始
+## 📋 环境准备
 
-### Linux / WSL2
+安装脚本会尽量自动安装所有工具，但少数包可能不在你的系统源里。建议提前手动装好基础工具——装不上不影响整体安装，脚本遇到缺失会跳过并提示。
+
+### Ubuntu / Debian
+
+```bash
+sudo apt update
+sudo apt install -y zsh git vim tmux curl wget
+sudo apt install -y bat btop fd-find fzf fonts-powerline jq zoxide
+# 以下在老旧/太新的系统上可能没有，见下方故障排除
+sudo apt install -y eza glow tealdeer gh
+```
+
+### macOS
+
+```bash
+brew install bash git zsh vim tmux curl wget
+brew install bat btop fd fzf jq zoxide
+# 其余由 Brewfile 托管
+```
+
+### Arch Linux
+
+```bash
+sudo pacman -S zsh git vim tmux curl wget
+sudo pacman -S bat btop fd fzf jq zoxide eza glow tealdeer github-cli
+```
+
+### CentOS / RHEL
+
+```bash
+sudo dnf install -y zsh git vim tmux curl wget
+sudo dnf install -y bat btop fzf jq zoxide
+# eza 不在 EPEL 源里，从 GitHub Release 安装
+# glow、tealdeer 同上
+```
+
+## 🔧 故障排除
+
+个别包不在某些发行版源里，以下是逐包备用安装方案：
+
+| 包 | 备用安装 |
+|----|----------|
+| eza | `wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc \| sudo tee /etc/apt/keyrings/gierens.asc && echo "deb [signed-by=/etc/apt/keyrings/gierens.asc] http://deb.gierens.de stable main" \| sudo tee /etc/apt/sources.list.d/gierens.list && sudo apt update && sudo apt install -y eza` |
+| glow | `curl -L https://github.com/charmbracelet/glow/releases/latest/download/glow_Linux_x86_64.tar.gz \| tar -xz -C /usr/local/bin glow` |
+| tealdeer | `pip3 install tldr` 或 `cargo install tealdeer` |
+| gh | `type -p curl >/dev/null && sudo curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o /etc/apt/keyrings/githubcli.gpg && echo "deb [signed-by=/etc/apt/keyrings/githubcli.gpg] https://cli.github.com/packages stable main" \| sudo tee /etc/apt/sources.list.d/github-cli.list && sudo apt update && sudo apt install -y gh` |
+| dust | 安装脚本会自动从 GitHub Release 下载安装 |
+
+## 🚀 快速开始
 
 ```bash
 git clone https://github.com/DustinJiang123/dotfiles.git ~/dotfiles
@@ -43,19 +91,13 @@ cd ~/dotfiles
 
 ### macOS
 
-macOS 自带的 bash 是 3.2 版本，安装脚本无法运行，需要先装新版 bash：
+macOS 自带的 bash 是 3.2 版本，需要先装新版 bash：
 
 ```bash
 brew install bash
-git clone https://github.com/DustinJiang123/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-./install.sh
 ```
 
-安装脚本会自动识别 macOS 并：
-- 用 Homebrew（`Brewfile`）替代 `apt`
-- 跳过 Linux 风格的字体下载（macOS 字体由 Brewfile 中的 cask 装到 `~/Library/Fonts`）
-- 跳过 dust 的 Linux 二进制下载（改由 Brewfile 中的 `brew install dust` 处理）
+然后执行同上 clone + install 步骤。安装脚本会自动识别 macOS，用 `brew` 替代 `apt`。
 
 ### 安装流程
 
