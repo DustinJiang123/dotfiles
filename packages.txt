@@ -1,0 +1,17 @@
+# Linux (apt) packages — install with:
+#   sudo apt install -y $(cat packages.txt)
+
+bat
+btop
+eza
+fd-find
+fzf
+gh
+git
+glow
+jq
+tealdeer
+tmux
+vim
+zoxide
+zsh
