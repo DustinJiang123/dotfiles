@@ -49,7 +49,7 @@ Open a new terminal, or run `source ~/.zshrc`.
 
 | Step | Risk | Description |
 |------|------|-------------|
-| 1. System packages | Medium | Installs packages via `apt` from `packages.txt` |
+| 1. System packages | Medium | Installs via `apt` (Linux) or `brew` (macOS) |
 | 2. Shell config | Low | Appends a `source` line to `~/.zshrc` |
 | 3. Oh My Zsh | Medium | Downloads and installs the OMZ framework |
 | 4. Zsh plugins | Low | Clones autosuggestions and syntax-highlighting |
@@ -82,7 +82,7 @@ dotfiles/
 ├── README.md               # This file (English)
 ├── README.zh-CN.md         # Chinese README
 ├── packages.txt             # apt packages
-├── Brewfile                 # macOS packages (WIP)
+├── Brewfile                 # macOS packages
 ├── home/
 │   ├── .zshrc               # Shell config (aliases, plugins, cfg helper)
 │   ├── .vimrc               # Vim config + 10 plugins

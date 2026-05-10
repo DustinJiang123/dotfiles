@@ -49,7 +49,7 @@ cd ~/dotfiles
 
 | 步骤 | 风险 | 说明 |
 |------|------|------|
-| 1. 系统软件包 | 中 | 通过 `apt` 安装 `packages.txt` 中的工具 |
+| 1. 系统软件包 | 中 | 通过 `apt`（Linux）或 `brew`（macOS）安装 |
 | 2. Shell 配置 | 低 | 在 `~/.zshrc` 末尾追加 source 行 |
 | 3. Oh My Zsh | 中 | 下载安装 Oh My Zsh 框架 |
 | 4. Zsh 插件 | 低 | clone autosuggestions 和 syntax-highlighting |
@@ -82,7 +82,7 @@ dotfiles/
 ├── README.md               # 英文 README
 ├── README.zh-CN.md         # 中文 README
 ├── packages.txt             # apt 包清单
-├── Brewfile                 # macOS 包清单（待完善）
+├── Brewfile                 # macOS 包清单
 ├── home/
 │   ├── .zshrc               # Shell 配置（别名、插件、cfg 命令）
 │   ├── .vimrc               # Vim 配置 + 10 个插件
