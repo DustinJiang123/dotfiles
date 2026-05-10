@@ -31,13 +31,32 @@
 
 ## 🚀 Quick Start
 
+### Linux / WSL2
+
 ```bash
 git clone https://github.com/DustinJiang123/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./install.sh
 ```
 
-The installer will:
+### macOS
+
+macOS ships with bash 3.2 which the installer cannot use, so install a newer bash first:
+
+```bash
+brew install bash
+git clone https://github.com/DustinJiang123/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./install.sh
+```
+
+The installer auto-detects macOS and will:
+- Use Homebrew (via `Brewfile`) instead of `apt`
+- Skip the Linux-side font download (the Brewfile cask handles fonts via `~/Library/Fonts`)
+- Skip the Linux-only `dust` binary download (installed via `brew install dust` in the Brewfile)
+
+### What the installer does
+
 1. Ask your language preference
 2. Show an interactive menu — toggle items with numbers, Enter to confirm
 3. Run each step with a risk label and a confirmation prompt

@@ -31,13 +31,32 @@
 
 ## 🚀 快速开始
 
+### Linux / WSL2
+
 ```bash
 git clone https://github.com/DustinJiang123/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./install.sh
 ```
 
-安装流程：
+### macOS
+
+macOS 自带的 bash 是 3.2 版本，安装脚本无法运行，需要先装新版 bash：
+
+```bash
+brew install bash
+git clone https://github.com/DustinJiang123/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./install.sh
+```
+
+安装脚本会自动识别 macOS 并：
+- 用 Homebrew（`Brewfile`）替代 `apt`
+- 跳过 Linux 风格的字体下载（macOS 字体由 Brewfile 中的 cask 装到 `~/Library/Fonts`）
+- 跳过 dust 的 Linux 二进制下载（改由 Brewfile 中的 `brew install dust` 处理）
+
+### 安装流程
+
 1. 选择语言（中文 / English）
 2. 交互式菜单 — 输入序号切换选项，回车确认
 3. 每步标注风险等级，执行前需确认
