@@ -451,6 +451,22 @@ step_shell() {
     echo "$source_line" >> "$rc"
     ok "$name: ${T[shell_added]}"
   done
+
+  # .vimrc — same source-based approach
+  local vimrc="$HOME/.vimrc"
+  local vim_source_line='source ~/dotfiles/home/.vimrc'
+
+  if [ -f "$vimrc" ] && grep -qF "source ~/dotfiles/home/.vimrc" "$vimrc" 2>/dev/null; then
+    ok ".vimrc: ${T[shell_exists]}"
+  else
+    if [ -f "$vimrc" ]; then
+      backup_file "$vimrc"
+    fi
+    echo "\" Dotfiles — added by install.sh" > "$vimrc"
+    echo "$vim_source_line" >> "$vimrc"
+    ok ".vimrc: ${T[shell_added]}"
+  fi
+
   return 0
 }
 
