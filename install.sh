@@ -130,10 +130,25 @@ set_lang() {
         [font_wsl]="检测到 WSL2 环境，请在 Windows 端手动安装字体。"
         [font_wsl_guide]="下载地址：https://www.nerdfonts.com/font-downloads （搜索 Meslo）"
         [font_wsl_guide2]="下载后右键 .ttf 安装，然后在 Windows Terminal 设置中将 WSL 字体设为 'MesloLGS NF'"
+        [font_macos]="检测到 macOS 环境，字体由 Brewfile 中的 cask font-meslo-lg-nerd-font 处理，跳过。"
         [font_exists]="Meslo Nerd Font 已安装，跳过。"
         [font_installing]="正在下载并安装 Meslo Nerd Font..."
         [font_ok]="字体安装完成。"
         [font_fail]="字体安装失败，可手动下载。"
+
+        # Misc messages (i18n cleanup)
+        [run_summary]="即将执行以下操作："
+        [no_rc_found]="未找到 ~/.zshrc 或 ~/.bashrc，将创建一个新的 ~/.zshrc"
+        [rc_created]="已创建 ~/.zshrc"
+        [omz_not_installed_skip]="Oh My Zsh 未安装，跳过插件安装。"
+        [arch_unsupported]="不支持架构"
+        [skip_dust]="跳过 dust"
+        [vim_plugin_warn]="Vim 插件安装可能有误，请手动检查。"
+        [extra_dust_macos]="macOS 用户请通过 Brewfile 安装 dust（brew install dust），跳过。"
+        [brew_will_install]="将通过 Homebrew 安装以下软件包："
+        [brew_updating]="正在更新 Homebrew..."
+        [brew_installing]="正在通过 Homebrew 安装软件包..."
+        [no_pkg_mgr]="未找到支持的包管理器（apt 或 brew）。"
 
         # Summary
         [summary_title]="安装摘要"
@@ -245,10 +260,25 @@ set_lang() {
         [font_wsl]="WSL2 detected. Font must be installed on Windows side."
         [font_wsl_guide]="Download from: https://www.nerdfonts.com/font-downloads (search Meslo)"
         [font_wsl_guide2]="Install the .ttf, then set WSL font to 'MesloLGS NF' in Windows Terminal settings."
+        [font_macos]="macOS detected. Font is handled by Brewfile (cask font-meslo-lg-nerd-font), skipping."
         [font_exists]="Meslo Nerd Font already installed, skipping."
         [font_installing]="Downloading and installing Meslo Nerd Font..."
         [font_ok]="Font installed."
         [font_fail]="Font installation failed. You can install it manually."
+
+        # Misc messages (i18n cleanup)
+        [run_summary]="The following operations will be executed:"
+        [no_rc_found]="Neither ~/.zshrc nor ~/.bashrc found, creating a new ~/.zshrc"
+        [rc_created]="Created ~/.zshrc"
+        [omz_not_installed_skip]="Oh My Zsh not installed, skipping plugin install."
+        [arch_unsupported]="Unsupported architecture"
+        [skip_dust]="skipping dust"
+        [vim_plugin_warn]="Vim plugin install may have issues, please check manually."
+        [extra_dust_macos]="On macOS, install dust via Brewfile (brew install dust). Skipping."
+        [brew_will_install]="Will install the following via Homebrew:"
+        [brew_updating]="Updating Homebrew..."
+        [brew_installing]="Installing packages via Homebrew..."
+        [no_pkg_mgr]="No supported package manager found (apt or brew)."
 
         # Summary
         [summary_title]="Installation Summary"
@@ -349,9 +379,9 @@ step_packages() {
   elif command -v brew &>/dev/null; then
     # ── macOS / Homebrew ───────────────────────────────
     echo ""
-    echo "Will install the following via Homebrew:"
+    echo "${T[brew_will_install]}"
     echo ""
-    if [ -f "$DOTFILES/Brewfile" ] && grep -qv '^#' "$DOTFILES/Brewfile"; then
+    if [ -f "$DOTFILES/Brewfile" ]; then
       grep -v '^#' "$DOTFILES/Brewfile" | grep -v '^[[:space:]]*$' | sed 's/^/  /'
     fi
     echo ""
@@ -364,10 +394,10 @@ step_packages() {
       return 2
     fi
 
-    info "Updating Homebrew..."
+    info "${T[brew_updating]}"
     brew update
 
-    info "Installing packages..."
+    info "${T[brew_installing]}"
     if brew bundle --file="$DOTFILES/Brewfile"; then
       ok "${T[apt_ok]}"
       return 0
@@ -377,7 +407,7 @@ step_packages() {
     fi
 
   else
-    fail "No supported package manager found (apt or brew)."
+    fail "${T[no_pkg_mgr]}"
     return 1
   fi
 }
@@ -396,9 +426,9 @@ step_shell() {
   done
 
   if [ ${#targets[@]} -eq 0 ]; then
-    warn "未找到 ~/.zshrc 或 ~/.bashrc，创建一个新的 ~/.zshrc"
+    warn "${T[no_rc_found]}"
     echo "$source_line" > "$HOME/.zshrc"
-    ok "已创建 ~/.zshrc"
+    ok "${T[rc_created]}"
     return 0
   fi
 
@@ -460,7 +490,7 @@ step_plugins() {
   local custom_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
 
   if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    warn "Oh My Zsh 未安装，跳过插件安装。"
+    warn "${T[omz_not_installed_skip]}"
     return 2
   fi
 
@@ -492,6 +522,11 @@ step_extra() {
   # --- dust ---
   if command -v dust &>/dev/null; then
     ok "${T[extra_dust_exists]}"
+  elif is_macos; then
+    # macOS users get dust via Brewfile; the upstream linux-gnu binary
+    # does not run on Darwin and the architecture string is "arm64"
+    # (not "aarch64") so the matcher below would miss it anyway.
+    warn "${T[extra_dust_macos]}"
   else
     info "${T[plugin_installing]} ${T[extra_dust]}..."
     local arch
@@ -502,7 +537,7 @@ step_extra() {
       x86_64)  dust_url="https://github.com/bootandy/dust/releases/latest/download/dust-x86_64-unknown-linux-gnu.tar.gz" ;;
       aarch64) dust_url="https://github.com/bootandy/dust/releases/latest/download/dust-aarch64-unknown-linux-gnu.tar.gz" ;;
       *)
-        warn "不支持架构 $arch，跳过 dust。"
+        warn "${T[arch_unsupported]} $arch, ${T[skip_dust]}."
         ;;
     esac
 
@@ -539,7 +574,11 @@ step_extra() {
   # --- vim plugins ---
   if [ -f "$HOME/.vim/autoload/plug.vim" ]; then
     info "${T[plugin_installing]} ${T[extra_vimplugins]}..."
-    vim -c 'PlugInstall' -c 'qa!' 2>/dev/null && ok "${T[extra_vimplugins_ok]}" || warn "Vim 插件安装可能有误，请手动检查。"
+    if vim -c 'PlugInstall' -c 'qa!' 2>/dev/null; then
+      ok "${T[extra_vimplugins_ok]}"
+    else
+      warn "${T[vim_plugin_warn]}"
+    fi
   else
     warn "${T[extra_skip]}"
   fi
@@ -554,6 +593,14 @@ step_font() {
     warn "${T[font_wsl]}"
     echo "  ${T[font_wsl_guide]}"
     echo "  ${T[font_wsl_guide2]}"
+    return 0
+  fi
+
+  if is_macos; then
+    # macOS handles fonts via Homebrew cask in the Brewfile.
+    # The Linux paths (~/.local/share/fonts) and tooling (fc-cache) do
+    # not apply on Darwin; system fonts live in ~/Library/Fonts.
+    warn "${T[font_macos]}"
     return 0
   fi
 
@@ -675,7 +722,7 @@ main() {
 
   # Summary of what will be done
   echo ""
-  info "即将执行以下操作："
+  info "${T[run_summary]}"
   for i in $(seq 1 6); do
     if [ "${SELECTED[$i]}" = "✓" ]; then
       local item="menu_item_$i"
