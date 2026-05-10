@@ -1,8 +1,33 @@
 # dotfiles
 
-个人终端环境一键部署。换电脑、重装系统后一条命令恢复全部配置。
+> Personal terminal environment, one command away.
 
-## 快速开始
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20WSL2-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash-yellow" alt="Shell">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+</p>
+
+---
+
+## 💡 Philosophy
+
+- **Safe by default** — never overwrites your configs; appends a single `source` line
+- **Interactive** — choose what to install, skip what you don't need
+- **Idempotent** — run it ten times, same result
+- **Visible** — every modification creates a timestamped backup
+
+## ✨ Features
+
+| Category | What you get |
+|----------|-------------|
+| Shell | Oh My Zsh + agnoster theme + syntax highlighting + autosuggestions |
+| Navigation | zoxide (smart `cd`) + fzf (fuzzy finder) |
+| Productivity | `bat` (syntax-highlighted cat), `eza` (modern ls), `fd` (modern find) |
+| Editor | Vim + 10 plugins (NERDTree, fugitive, fzf.vim, etc.) |
+| Tools | jq, glow, gh, tldr, btop, dust, tmux |
+
+## 🚀 Quick Start
 
 ```bash
 git clone https://github.com/DustinJiang123/dotfiles.git ~/dotfiles
@@ -10,64 +35,94 @@ cd ~/dotfiles
 ./install.sh
 ```
 
-运行后：
-1. 选择语言（中文/英文）
-2. 勾选需要的操作（每项标注了风险等级）
-3. 确认后逐项执行，修改前自动备份
+The installer will:
+1. Ask your language preference
+2. Show an interactive menu — toggle items with numbers, Enter to confirm
+3. Run each step with a risk label and a confirmation prompt
+4. Print a summary with backup locations
 
-打开新终端或执行 `source ~/.zshrc`。
+Open a new terminal, or run `source ~/.zshrc`.
 
-## 安全设计
+## 🔧 Installer Steps
 
-**绝不覆盖你的配置文件。** 采用 source 机制而非符号链接：
+| Step | Risk | Description |
+|------|------|-------------|
+| 1. System packages | Medium | Installs packages via `apt` from `packages.txt` |
+| 2. Shell config | Low | Appends a `source` line to `~/.zshrc` |
+| 3. Oh My Zsh | Medium | Downloads and installs the OMZ framework |
+| 4. Zsh plugins | Low | Clones autosuggestions and syntax-highlighting |
+| 5. Extra tools | Medium | dust, vim-plug, vim plugins |
+| 6. Nerd Font | Low | Meslo Nerd Font (skipped on WSL2 — install manually) |
 
-- `~/.zshrc` 保持你的本地配置不变
-- 脚本只在末尾追加一行 `source ~/dotfiles/home/.zshrc`
-- 所有修改操作前创建时间戳备份到 `~/.dotfiles-backups/`
+All steps show the exact command before running and create backups before modifying files.
 
-## 包含内容
+## 🛡️ Safe by Design
 
-| 配置 | 文件 |
-|------|------|
-| Shell (zsh) | `home/.zshrc` |
-| Vim | `home/.vimrc` |
-| Profile | `home/.profile` |
-| 工具速查手册 | `docs/tools-cheatsheet.md` |
-| 包清单 | `packages.txt` (Linux) / `Brewfile` (macOS) |
+We use a **source-based** approach, not symlinks:
 
-## 安装的工具
-
-**Shell：** zsh + oh-my-zsh + zsh-autosuggestions + zsh-syntax-highlighting + zoxide + fzf  
-**编辑器：** vim + 10 个插件（NERDTree、fzf、fugitive、surround、commentary、gruvbox 等）  
-**命令行：** eza、bat、fd、jq、glow、gh、tldr、btop、dust  
-**别名：** `c` → claude、`ls` → eza、`cat` → batcat、`fd` → fdfind
-
-## 跨平台
-
-- Linux：apt 安装 + `packages.txt`
-- macOS：`Brewfile` 待完善
-- Windows：通过 WSL2 使用本项目
-
-## 字体
-
-agnoster 主题需要 Powerline 字体。
-
-**WSL2 用户：** 字体须装在 Windows 侧。下载 [Meslo Nerd Font](https://www.nerdfonts.com/font-downloads)，安装 `.ttf` 后，在 Windows Terminal 设置 → 外观 → 字体 中输入 `MesloLGS Nerd Font`。
-
-## 日常维护
-
-用 `cfg` 命令管理配置，不要直接改文件：
-
-```bash
-cfg help         # 查看所有命令
-cfg edit         # 编辑 dotfiles 配置
-cfg reload       # 立即生效
-cfg status       # 查看变更
-cfg diff         # 查看具体改动
-cfg log          # 查看提交历史
-cfg backup       # 备份当前 ~/.zshrc
-cfg commit "消息" # 提交到 git（不自动 push）
-cfg push         # 推送到 GitHub（会先确认）
+```
+~/.zshrc          ← Your local config (Oh My Zsh, nvm, etc.)
+    ↓ source
+~/dotfiles/home/.zshrc  ← Managed by this repo (aliases, plugins, tools)
 ```
 
-配置的分工见 `~/.zshrc` 顶部的注释说明。
+- Your `~/.zshrc` stays intact — only one line is appended
+- Backups go to `~/.dotfiles-backups/<timestamp>/`
+- Remove the `source` line to uninstall completely
+
+The top of `~/.zshrc` includes a comment for AI assistants, telling them to edit the dotfiles copy instead.
+
+## 📁 What's Inside
+
+```
+dotfiles/
+├── install.sh              # Interactive installer (zh/en)
+├── README.md               # This file (English)
+├── README.zh-CN.md         # Chinese README
+├── packages.txt             # apt packages
+├── Brewfile                 # macOS packages (WIP)
+├── home/
+│   ├── .zshrc               # Shell config (aliases, plugins, cfg helper)
+│   ├── .vimrc               # Vim config + 10 plugins
+│   └── .profile             # Path setup
+├── scripts/
+│   └── extra-install.sh     # Dust, vim-plug, Nerd Font, etc.
+└── docs/
+    └── tools-cheatsheet.md  # Quick reference
+```
+
+## 📅 Daily Use
+
+```bash
+cfg help         # Show all commands
+cfg edit         # Edit dotfiles config
+cfg reload       # Apply changes immediately
+cfg status       # See what changed
+cfg diff         # Review the diff
+cfg log          # View commit history
+cfg backup       # Backup current ~/.zshrc
+cfg commit "msg" # Commit (no auto-push)
+cfg push         # Push to GitHub (with confirmation)
+```
+
+## 🖥️ Platform Support
+
+| Platform | Status |
+|----------|--------|
+| Ubuntu / Debian | Full support |
+| macOS | Brewfile (WIP) |
+| WSL2 | Full support; font installed on Windows side |
+| Other Linux | Manual package install |
+
+## 🔠 Font
+
+The **agnoster** theme requires a Powerline-patched font. The installer handles this for native Linux.
+
+**WSL2 users** — install the font on Windows:
+1. Download [Meslo Nerd Font](https://www.nerdfonts.com/font-downloads)
+2. Right-click `.ttf` → Install
+3. Windows Terminal → Settings → Appearance → Font → `MesloLGS Nerd Font`
+
+## 📄 License
+
+MIT
