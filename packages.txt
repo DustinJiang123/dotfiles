@@ -5,6 +5,7 @@ bat
 btop
 eza
 fd-find
+fonts-powerline
 fzf
 gh
 git

@@ -35,6 +35,12 @@ cd ~/dotfiles
 - macOS：`Brewfile` 待完善
 - Windows：通过 WSL2 使用本项目
 
+## 字体
+
+agnoster 主题需要 Powerline 字体。安装脚本会自动检测并安装 Meslo Nerd Font。
+
+**WSL2 用户：** 字体需要装在 Windows 侧。下载 [Meslo Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/latest)，安装 `.ttf` 后，在 Windows Terminal 设置 → 配置文件 → 外观 → 字体 中选 `MesloLGS NF`。
+
 ## 日常维护
 
 编辑 `~/dotfiles/home/` 下的文件，提交推送即可同步到其他机器。

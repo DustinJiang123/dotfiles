@@ -21,6 +21,25 @@ install_dust() {
   echo "dust $(dust --version) installed"
 }
 
+install_font() {
+  # Linux native: install Nerd Font for Powerline glyphs
+  # WSL2: font is installed on Windows side, skip
+  if grep -qi microsoft /proc/version 2>/dev/null; then
+    echo "WSL2 detected — install font on Windows side (see README)"
+    return
+  fi
+  local font_dir="$HOME/.local/share/fonts"
+  if [ -f "$font_dir/MesloLGSNerdFont-Regular.ttf" ]; then
+    echo "Meslo Nerd Font already installed"
+    return
+  fi
+  mkdir -p "$font_dir"
+  local url="https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Meslo/S/Regular/MesloLGSNerdFont-Regular.ttf"
+  wget -qO "$font_dir/MesloLGSNerdFont-Regular.ttf" "$url"
+  fc-cache -f "$font_dir"
+  echo "Meslo Nerd Font installed"
+}
+
 install_ohmyzsh() {
   if [ -d "$HOME/.oh-my-zsh" ]; then
     echo "Oh My Zsh already installed"
@@ -47,6 +66,7 @@ install_vimplugins() {
 
 # Run all extra installs
 install_dust
+install_font
 install_ohmyzsh
 install_vimplug
 install_vimplugins
