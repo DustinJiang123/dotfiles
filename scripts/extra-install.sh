@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 # Extra tool installers — each function is idempotent and confirms before acting.
 # Called by install.sh. Can also run standalone:  bash scripts/extra-install.sh
+#
+# Requires bash 4+ (for associative arrays). See install.sh for the same guard.
+if [ -z "${BASH_VERSION:-}" ] || [ "${BASH_VERSINFO[0]:-0}" -lt 4 ]; then
+  for newer_bash in /opt/homebrew/bin/bash /usr/local/bin/bash; do
+    if [ -x "$newer_bash" ]; then
+      exec "$newer_bash" "$0" "$@"
+    fi
+  done
+  echo "ERROR: This script requires bash 4 or newer (brew install bash on macOS)." >&2
+  exit 1
+fi
+
 set -euo pipefail
 
 DOTFILES_LANG="${DOTFILES_LANG:-en}"

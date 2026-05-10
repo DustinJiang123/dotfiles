@@ -1,5 +1,8 @@
-# Linux (apt) packages — install with:
-#   sudo apt install -y $(cat packages.txt)
+# Linux (apt) packages — installed individually by install.sh so one
+# missing package does not abort the whole batch. On older Ubuntu/Debian
+# or distros without the universe repo, some packages may not be available
+# (e.g. `tealdeer` requires Ubuntu 24.04+ universe). Failures are warned
+# but do not stop the installation.
 
 bat
 curl
