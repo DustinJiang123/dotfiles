@@ -42,3 +42,13 @@ fi
 eval "$(zoxide init zsh)"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# ---- dotfiles management ------------------------------------------------
+cfg() {
+  case "${1:-}" in
+    edit)   ${EDITOR:-vim} ~/dotfiles/home/.zshrc ;;
+    reload) source ~/.zshrc ;;
+    commit) shift; git -C ~/dotfiles add -A && git -C ~/dotfiles commit -m "${*}" && git -C ~/dotfiles push ;;
+    *)      cd ~/dotfiles ;;
+  esac
+}
