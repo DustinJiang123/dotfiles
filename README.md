@@ -2,6 +2,8 @@
 
 > Personal terminal environment, one command away.
 
+[English](README.md) | [中文](README.zh-CN.md)
+
 <p align="center">
   <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20WSL2-blue" alt="Platform">
   <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash-yellow" alt="Shell">
@@ -87,8 +89,9 @@ dotfiles/
 │   └── .profile             # Path setup
 ├── scripts/
 │   └── extra-install.sh     # Dust, vim-plug, Nerd Font, etc.
-└── docs/
-    └── tools-cheatsheet.md  # Quick reference
+├── docs/
+│   ├── tools-cheatsheet.md      # Quick reference (Chinese)
+│   └── tools-cheatsheet-en.md   # Quick reference (English)
 ```
 
 ## 📅 Daily Use

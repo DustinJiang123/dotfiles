@@ -2,6 +2,8 @@
 
 > 个人终端环境，一条命令搞定。
 
+[English](README.md) | [中文](README.zh-CN.md)
+
 <p align="center">
   <img src="https://img.shields.io/badge/平台-Linux%20%7C%20macOS%20%7C%20WSL2-blue" alt="Platform">
   <img src="https://img.shields.io/badge/Shell-zsh%20%7C%20bash-yellow" alt="Shell">
@@ -87,8 +89,9 @@ dotfiles/
 │   └── .profile             # 路径配置
 ├── scripts/
 │   └── extra-install.sh     # dust、vim-plug、字体等扩展安装
-└── docs/
-    └── tools-cheatsheet.md  # 工具速查手册
+├── docs/
+│   ├── tools-cheatsheet.md      # 工具速查手册（中文）
+│   └── tools-cheatsheet-en.md   # 工具速查手册（English）
 ```
 
 ## 📅 日常使用

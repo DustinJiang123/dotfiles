@@ -82,7 +82,7 @@ cat -l python file.py # 强制指定语言
 cat --theme=ansi      # 无颜色输出（管道用）
 ```
 
-默认别名已设 `alias cat='bat --paging=never'`，管道时自动不输出颜色。
+默认别名已设 `alias cat='batcat --paging=never'`（Ubuntu 下二进制名为 `batcat`），管道时自动不输出颜色。
 
 ---
 
