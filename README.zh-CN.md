@@ -23,11 +23,13 @@
 
 | 分类 | 内容 |
 |------|------|
-| Shell | Oh My Zsh + agnoster 主题 + 语法高亮 + 自动补全建议 |
+| Shell | Oh My Zsh + Powerlevel10k（或 agnoster）+ 语法高亮 + 自动补全建议 |
 | 导航 | zoxide（智能跳转）+ fzf + `..` `...` `....` 快捷返回 |
 | 效率工具 | `mkd`（创建并进入）、`tre`（树状查看）、`server`（HTTP 服务）、`fs`（大小统计）、`bat`、`eza`、`fd` |
-| 编辑器 | Vim + 10 个插件（NERDTree、fugitive、fzf.vim 等） |
+| 编辑器 | Vim + 插件（NERDTree、fugitive、fzf.vim 等） |
 | 其他 | jq、glow、gh、tldr、btop、dust、tmux、`dataurl`、`myip`、`cleanup` |
+| 历史 | 10 万条历史，追加即时写入，多会话共享 |
+| 分层 | 主题/历史/配色/插件每层都可独立关闭 |
 
 ## 🚀 快速开始
 
@@ -132,10 +134,39 @@ cfg push         # 推送到 GitHub（会先确认）
 创建 `~/.extra` 存放不想公开的内容：
 
 ```bash
-# ~/.extra — dotfiles 会自动加载，不会被 git 追踪
-export GITHUB_TOKEN="ghp_xxx"
-alias work="cd ~/projects/secret-project"
+cp ~/dotfiles/home/.extra.example ~/.extra
+# 然后编辑 ~/.extra
 ```
+
+`~/.extra` 由 `home/.zshrc` 在最后 source，可以覆盖一切默认值。
+完整模板见 `home/.extra.example`。
+
+### 分层开关
+
+`home/.zshrc` 拆成了若干层，每层都能独立关闭。在 `~/.zshrc` 的 `source`
+行**之前**设置即可：
+
+```bash
+# 跳过 OMZ 主题/插件层 —— 适用于你自己已经在用 p10k 或其他 prompt 框架
+export DOTFILES_SKIP_THEME=1
+
+# 分别跳过历史 / EZA_COLORS / BAT_THEME
+export DOTFILES_SKIP_HISTORY=1
+export DOTFILES_SKIP_COLORS=1
+
+# 在 dotfiles 默认插件之外追加你需要的插件
+export DOTFILES_EXTRA_PLUGINS=(z docker zsh-completions zsh-history-substring-search)
+
+[ -f ~/dotfiles/home/.zshrc ] && source ~/dotfiles/home/.zshrc
+```
+
+主题层启用时，dotfiles 会自动识别：
+
+1. 优先用 `powerlevel10k`（若 `$ZSH/custom/themes/powerlevel10k` 存在）
+2. 否则回退到 `agnoster`
+
+两个主题都开箱即用。p10k 模式下，如果你没有自己的 `~/.p10k.zsh`，
+会加载仓库里的 `home/.p10k.zsh` 作为默认。
 
 
 
