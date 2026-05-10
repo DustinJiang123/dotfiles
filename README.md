@@ -23,11 +23,13 @@
 
 | Category | What you get |
 |----------|-------------|
-| Shell | Oh My Zsh + agnoster theme + syntax highlighting + autosuggestions |
+| Shell | Oh My Zsh + Powerlevel10k (or agnoster) + syntax highlighting + autosuggestions |
 | Navigation | zoxide (smart `cd`) + fzf + `..` `...` `....` shortcuts |
 | Productivity | `mkd` (mkdir+cd), `tre` (tree), `server` (HTTP), `fs` (size), `bat`, `eza`, `fd` |
-| Editor | Vim + 10 plugins (NERDTree, fugitive, fzf.vim, etc.) |
+| Editor | Vim + plugins (NERDTree, fugitive, fzf.vim, etc.) |
 | Tools | jq, glow, gh, tldr, btop, dust, tmux, `dataurl`, `myip`, `cleanup` |
+| History | 100k entries, append-immediately, share between sessions |
+| Layered | Each layer (theme/history/colors/plugins) can be disabled per-machine |
 
 ## 🚀 Quick Start
 
@@ -132,10 +134,40 @@ cfg push         # Push to GitHub (with confirmation)
 Create `~/.extra` for anything you don't want in a public repo:
 
 ```bash
-# ~/.extra — sourced by dotfiles, never committed
-export GITHUB_TOKEN="ghp_xxx"
-alias work="cd ~/projects/secret-project"
+cp ~/dotfiles/home/.extra.example ~/.extra
+# then edit ~/.extra
 ```
+
+`~/.extra` is sourced last by `home/.zshrc`, so it can override anything.
+See `home/.extra.example` for the full template.
+
+### Per-layer opt-out
+
+`home/.zshrc` is split into layers you can disable individually. Set
+these in your `~/.zshrc` **before** the dotfiles `source` line:
+
+```bash
+# Skip the OMZ theme/plugin layer entirely — useful if you load p10k
+# or another prompt yourself, or maintain your own plugin list.
+export DOTFILES_SKIP_THEME=1
+
+# Skip history defaults / EZA_COLORS / BAT_THEME independently
+export DOTFILES_SKIP_HISTORY=1
+export DOTFILES_SKIP_COLORS=1
+
+# Add extra OMZ plugins on top of the dotfiles defaults
+export DOTFILES_EXTRA_PLUGINS=(z docker zsh-completions zsh-history-substring-search)
+
+[ -f ~/dotfiles/home/.zshrc ] && source ~/dotfiles/home/.zshrc
+```
+
+When the theme layer is enabled, dotfiles auto-detects:
+
+1. `powerlevel10k` if it's installed under `$ZSH/custom/themes/powerlevel10k`
+2. `agnoster` as the fallback
+
+Both themes work out of the box; for p10k, the bundled `home/.p10k.zsh`
+is loaded if you don't have your own `~/.p10k.zsh` already.
 
 
 
