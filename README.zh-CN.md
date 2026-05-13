@@ -84,7 +84,7 @@ sudo dnf install -y bat btop fzf jq zoxide
 ## 🚀 快速开始
 
 ```bash
-git clone https://github.com/DustinJiang123/dotfiles.git ~/dotfiles
+git clone https://github.com/jcdustin/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./install.sh
 ```
