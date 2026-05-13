@@ -84,7 +84,7 @@ Some packages are not available in every distro's repos. Here are per-package fa
 ## 🚀 Quick Start
 
 ```bash
-git clone https://github.com/DustinJiang123/dotfiles.git ~/dotfiles
+git clone https://github.com/jcdustin/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./install.sh
 ```
